@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary-gold: #d4af37;
+  --color-dark-bg: #110e0d;
+  --color-dark-card: #1c1816;
+  --color-red-seal: #b93b3b;
+
+  --font-serif: "Noto Serif SC", "ZCOOL XiaoWei", serif;
+  --font-sans: system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: #e5e5e5;
+  font-family: var(--font-serif);
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.seal-border {
+  border: 1px solid var(--color-red-seal);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
