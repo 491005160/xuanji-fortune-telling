@@ -19,7 +19,6 @@
     "express": "^4.21.2",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",
-    "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.546.0",
     "lunar-javascript": "^1.7.7",

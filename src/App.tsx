@@ -7,7 +7,7 @@ import { AstrologicalData, calculateAstrology } from "./lib/bazi";
 import { generateInterpretation, generateAIStream } from "./services/gemini";
 import { cn } from "./lib/utils";
 import { Starfield } from "./components/Starfield";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 
 type Page = "home" | "bazi" | "horoscope" | "tarot";
 
@@ -43,6 +43,9 @@ export default function App() {
 
   const [exportImage, setExportImage] = useState<string | null>(null);
 
+  const disclaimerText =
+    "本系统内容由 AI 结合传统文化文本生成，仅供娱乐与民俗文化体验，不构成现实决策、医疗、法律、投资或人生重大事项建议。";
+
   const returnToTop = () => {
     window.scrollTo({ top: 0, behavior: "auto" });
     window.requestAnimationFrame(() => {
@@ -55,17 +58,16 @@ export default function App() {
     setIsExporting(true);
     setExportMessage("正在渲染长图...");
     try {
-      const canvas = await html2canvas(ref.current, {
-        scale: 2,
+      const dataUrl = await toPng(ref.current, {
+        pixelRatio: 2,
         backgroundColor: "#141417",
-        useCORS: true,
+        cacheBust: true,
       });
-      const dataUrl = canvas.toDataURL("image/png");
       setExportImage(dataUrl);
       setExportMessage("");
     } catch (error) {
       console.error("Export Image failed:", error);
-      setExportMessage("生成失败,控制台有报错");
+      setExportMessage("生成失败，请稍后重试");
     } finally {
       setIsExporting(false);
       setTimeout(() => setExportMessage(""), 4000);
@@ -670,6 +672,11 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+        {(baziData || reading || isCalculating) && (
+          <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
+            {disclaimerText}
+          </p>
+        )}
         </div>
       </div>
       </div>
@@ -831,6 +838,11 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+          {(horoscopeReading || isHoroscopeCalculating) && (
+            <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
+              {disclaimerText}
+            </p>
+          )}
           </div>
         </div>
       </div>
@@ -990,6 +1002,11 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+          {(tarotReading || isTarotCalculating) && (
+            <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
+              {disclaimerText}
+            </p>
+          )}
           </div>
         </div>
       </div>
@@ -1081,7 +1098,7 @@ export default function App() {
         </AnimatePresence>
 
         <footer className="mt-auto pt-4 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-600 uppercase tracking-[0.2em] gap-2 z-10">
-          <span>大道简勤 · 命由我作</span>
+          <span>{disclaimerText}</span>
           <span>© 2026 MYSTIC PIVOT NUMEROLOGY</span>
           <span>北斗星辰核心引擎 载入完成</span>
         </footer>
