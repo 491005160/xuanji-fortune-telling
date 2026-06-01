@@ -43,6 +43,13 @@ export default function App() {
 
   const [exportImage, setExportImage] = useState<string | null>(null);
 
+  const returnToTop = () => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
+  };
+
   const handleGenerateImage = async (ref: React.RefObject<HTMLDivElement>) => {
     if (!ref.current) return;
     setIsExporting(true);
@@ -93,9 +100,8 @@ export default function App() {
     if (!dateStr) return;
 
     setIsCalculating(true);
-    setBaziData(null);
     setReading("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    returnToTop();
 
     try {
       // 1. Calculate traditional BaZi & Bone Weight
@@ -254,7 +260,7 @@ export default function App() {
     e.preventDefault();
     setIsHoroscopeCalculating(true);
     setHoroscopeReading("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    returnToTop();
     
     const prompt = `As an expert Astrologer, please provide a ${horoscopeType} reading for ${horoscopeSign}. Provide a comprehensive reading covering Love, Career, and General advice. Use Markdown format. Write in simplified Chinese.`;
     
@@ -279,7 +285,7 @@ export default function App() {
     if (!tarotQuestion.trim()) return;
     setIsTarotCalculating(true);
     setTarotReading("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    returnToTop();
     
     const prompt = `As an expert Tarot reader, the user is asking: "${tarotQuestion}". They chose the "${tarotSpread}" spread. Draw the cards for them, explain its visual and meaning, and give clear, spiritual but grounded advice based on the interaction of the cards. Format the output in Markdown. Use a mystic, profound tone. Write in simplified Chinese.`;
     
