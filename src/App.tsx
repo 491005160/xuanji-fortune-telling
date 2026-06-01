@@ -106,10 +106,6 @@ export default function App() {
       for await (const chunk of stream) {
         if (chunk.text) {
           setReading((prev) => prev + chunk.text);
-          endOfReadingRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-          });
         }
       }
     } catch (error) {
