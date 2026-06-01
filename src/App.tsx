@@ -672,11 +672,6 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
-        {(baziData || reading || isCalculating) && (
-          <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
-            {disclaimerText}
-          </p>
-        )}
         </div>
       </div>
       </div>
@@ -838,11 +833,6 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
-          {(horoscopeReading || isHoroscopeCalculating) && (
-            <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
-              {disclaimerText}
-            </p>
-          )}
           </div>
         </div>
       </div>
@@ -1002,11 +992,6 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
-          {(tarotReading || isTarotCalculating) && (
-            <p className="text-[10px] leading-relaxed text-slate-600 text-center px-4">
-              {disclaimerText}
-            </p>
-          )}
           </div>
         </div>
       </div>
