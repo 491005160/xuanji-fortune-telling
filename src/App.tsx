@@ -110,9 +110,12 @@ export default function App() {
       }
     } catch (error) {
       console.error(error);
+      const message =
+        error instanceof Error ? error.message : "请检查 Gemini API 配置。";
       setReading(
         (prev) =>
-          prev + "\n\n**【系统提示】** 天机混沌，推演过程中断，请重试。",
+          prev +
+          `\n\n**【系统提示】** 推演过程中断：${message}`,
       );
     } finally {
       setIsCalculating(false);

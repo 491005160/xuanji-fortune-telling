@@ -6,6 +6,16 @@ type GeminiRequest = {
   systemInstruction?: string;
 };
 
+type ErrorWithDetails = Error & {
+  status?: number;
+  statusCode?: number;
+  code?: string | number;
+  response?: {
+    status?: number;
+    statusText?: string;
+  };
+};
+
 const MAX_PROMPT_LENGTH = 20000;
 const MAX_SYSTEM_INSTRUCTION_LENGTH = 3000;
 
@@ -37,6 +47,32 @@ function sendJson(res: ServerResponse, statusCode: number, payload: unknown) {
   res.statusCode = statusCode;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.end(JSON.stringify(payload));
+}
+
+function normalizeError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return {
+      statusCode: 500,
+      message: "Unknown Gemini error.",
+    };
+  }
+
+  const detailedError = error as ErrorWithDetails;
+  const statusCode =
+    detailedError.status ||
+    detailedError.statusCode ||
+    detailedError.response?.status ||
+    500;
+  const parts = [
+    detailedError.message,
+    detailedError.code ? `code: ${detailedError.code}` : "",
+    detailedError.response?.statusText,
+  ].filter(Boolean);
+
+  return {
+    statusCode,
+    message: parts.join(" | ") || "Gemini request failed.",
+  };
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
@@ -105,8 +141,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.end();
   } catch (error) {
     console.error("Gemini API error:", error);
+    const normalizedError = normalizeError(error);
     if (!res.headersSent) {
-      sendJson(res, 500, { error: "Gemini request failed." });
+      sendJson(res, normalizedError.statusCode, {
+        error: normalizedError.message,
+      });
       return;
     }
     res.end();
