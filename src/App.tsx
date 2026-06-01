@@ -95,6 +95,7 @@ export default function App() {
     setIsCalculating(true);
     setBaziData(null);
     setReading("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     try {
       // 1. Calculate traditional BaZi & Bone Weight
@@ -253,6 +254,7 @@ export default function App() {
     e.preventDefault();
     setIsHoroscopeCalculating(true);
     setHoroscopeReading("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     
     const prompt = `As an expert Astrologer, please provide a ${horoscopeType} reading for ${horoscopeSign}. Provide a comprehensive reading covering Love, Career, and General advice. Use Markdown format. Write in simplified Chinese.`;
     
@@ -277,6 +279,7 @@ export default function App() {
     if (!tarotQuestion.trim()) return;
     setIsTarotCalculating(true);
     setTarotReading("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     
     const prompt = `As an expert Tarot reader, the user is asking: "${tarotQuestion}". They chose the "${tarotSpread}" spread. Draw the cards for them, explain its visual and meaning, and give clear, spiritual but grounded advice based on the interaction of the cards. Format the output in Markdown. Use a mystic, profound tone. Write in simplified Chinese.`;
     
