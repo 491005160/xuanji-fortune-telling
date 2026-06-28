@@ -54,6 +54,7 @@ export default function App() {
   const [dateStr, setDateStr] = useState<string>("1990-01-01T12:00");
   const [gender, setGender] = useState<"乾造" | "坤造">("乾造");
   const [isCalculating, setIsCalculating] = useState(false);
+  const [fortuneNotice, setFortuneNotice] = useState("");
 
   const [baziData, setBaziData] = useState<AstrologicalData | null>(null);
   const [reading, setReading] = useState<string>("");
@@ -62,6 +63,7 @@ export default function App() {
   const [horoscopeType, setHoroscopeType] = useState<string>("今日运势");
   const [isHoroscopeCalculating, setIsHoroscopeCalculating] = useState(false);
   const [horoscopeReading, setHoroscopeReading] = useState<string>("");
+  const [horoscopeNotice, setHoroscopeNotice] = useState("");
 
   const [tarotQuestion, setTarotQuestion] = useState<string>("");
   const [tarotSpread, setTarotSpread] = useState<string>("单牌指引");
@@ -204,6 +206,7 @@ export default function App() {
 
     setIsCalculating(true);
     setReading("");
+    setFortuneNotice("");
     returnToTop();
 
     try {
@@ -220,6 +223,7 @@ export default function App() {
       if (cached) {
         console.log("命中传统算命缓存", cacheKey);
         setReading(cached);
+        setFortuneNotice("此命盘已推演，已为你显示上次结果。");
         return;
       }
 
@@ -381,6 +385,7 @@ export default function App() {
     e.preventDefault();
     setIsHoroscopeCalculating(true);
     setHoroscopeReading("");
+    setHoroscopeNotice("");
     returnToTop();
 
     const date = getShanghaiDate();
@@ -392,6 +397,7 @@ export default function App() {
     if (cached) {
       console.log("命中星座运势缓存", cacheKey);
       setHoroscopeReading(cached);
+      setHoroscopeNotice("今日星象已定，已为你显示今日结果。");
       setIsHoroscopeCalculating(false);
       return;
     }
@@ -614,7 +620,7 @@ export default function App() {
 
             <button
               type="submit"
-              disabled={isCalculating}
+              disabled={isCalculating || !dateStr || !gender}
               className="w-full bg-[#1c1c21] hover:bg-[#1a1a1e] text-[#d4af37] py-3 mt-6 border border-slate-800 hover:border-[#d4af37]/50 shadow-lg shadow-black/20 transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-sm"
             >
               {isCalculating ? (
@@ -623,11 +629,16 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  启盘卜算{" "}
+                  {reading ? "查看命盘结果" : "启盘卜算"}{" "}
                   <Play className="w-4 h-4 fill-current opacity-70 group-hover:opacity-100 transition-opacity ml-1" />
                 </>
               )}
             </button>
+            {fortuneNotice && (
+              <p className="text-xs text-[#d4af37]/70 text-center tracking-wider">
+                {fortuneNotice}
+              </p>
+            )}
           </form>
         </div>
       </motion.div>
@@ -925,7 +936,11 @@ export default function App() {
 
               <button
                 type="submit"
-                disabled={isHoroscopeCalculating}
+                disabled={
+                  isHoroscopeCalculating ||
+                  !normalizeCachePart(horoscopeSign) ||
+                  !normalizeCachePart(horoscopeType)
+                }
                 className="w-full bg-[#1c1c21] hover:bg-[#1a1a1e] text-[#d4af37] py-3 mt-6 border border-slate-800 hover:border-[#d4af37]/50 shadow-lg shadow-black/20 transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-sm"
               >
                 {isHoroscopeCalculating ? (
@@ -934,10 +949,15 @@ export default function App() {
                   </>
                 ) : (
                   <>
-                    洞悉星象 <Play className="w-4 h-4 fill-current opacity-70 group-hover:opacity-100 transition-opacity ml-1" />
+                    {horoscopeReading ? "查看今日运势" : "洞悉星象"} <Play className="w-4 h-4 fill-current opacity-70 group-hover:opacity-100 transition-opacity ml-1" />
                   </>
                 )}
               </button>
+              {horoscopeNotice && (
+                <p className="text-xs text-[#d4af37]/70 text-center tracking-wider">
+                  {horoscopeNotice}
+                </p>
+              )}
             </form>
           </div>
         </motion.div>
