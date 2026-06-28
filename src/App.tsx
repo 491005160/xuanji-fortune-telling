@@ -19,6 +19,34 @@ const getShanghaiDate = () =>
     day: "2-digit",
   }).format(new Date());
 
+const normalizeCachePart = (value: string) => value.trim().replace(/\s+/g, "");
+
+const normalizeName = (value: string) => {
+  const normalized = normalizeCachePart(value);
+  return normalized || "anonymous";
+};
+
+const normalizeDateTimeLocal = (value: string) => {
+  const normalized = value.trim();
+  const match = normalized.match(/^(\d{4}-\d{2}-\d{2})[T\s](\d{2}):(\d{2})/);
+
+  if (match) {
+    return `${match[1]}T${match[2]}:${match[3]}`;
+  }
+
+  const parsed = new Date(normalized);
+  if (!Number.isNaN(parsed.getTime())) {
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getDate()).padStart(2, "0");
+    const hours = String(parsed.getHours()).padStart(2, "0");
+    const minutes = String(parsed.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  return normalizeCachePart(normalized);
+};
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
@@ -183,8 +211,10 @@ export default function App() {
       const data = calculateAstrology(dateStr, gender);
       setBaziData(data);
 
-      const normalizedName = name.trim() || "anonymous";
-      const cacheKey = `bazi:${dateStr}:${gender}:${normalizedName}`;
+      const normalizedBirthDateTime = normalizeDateTimeLocal(dateStr);
+      const normalizedGender = normalizeCachePart(gender);
+      const normalizedName = normalizeName(name);
+      const cacheKey = `fortune:${normalizedBirthDateTime}:${normalizedGender}:${normalizedName}`;
       const cached = localStorage.getItem(cacheKey);
 
       if (cached) {
@@ -354,7 +384,9 @@ export default function App() {
     returnToTop();
 
     const date = getShanghaiDate();
-    const cacheKey = `horoscope:${date}:${horoscopeSign}:${horoscopeType}`;
+    const normalizedSign = normalizeCachePart(horoscopeSign);
+    const normalizedType = normalizeCachePart(horoscopeType);
+    const cacheKey = `horoscope:${date}:${normalizedSign}:${normalizedType}`;
     const cached = localStorage.getItem(cacheKey);
 
     if (cached) {
