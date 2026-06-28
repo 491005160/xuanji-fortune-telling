@@ -62,7 +62,7 @@ async function streamOpenAICompatible(res, prompt, systemInstruction) {
     body: JSON.stringify({
       model,
       stream: true,
-      temperature: 0.7,
+      temperature: 0.3,
       messages: [
         {
           role: "system",
@@ -144,7 +144,7 @@ async function streamGemini(res, prompt, systemInstruction) {
     model,
     contents: prompt,
     config: {
-      temperature: 0.7,
+      temperature: 0.3,
       systemInstruction:
         systemInstruction || "你是一位专业大师，以严谨神秘的风格提供解答。",
     },

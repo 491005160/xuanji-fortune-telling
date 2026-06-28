@@ -11,6 +11,14 @@ import { toPng } from "html-to-image";
 
 type Page = "home" | "bazi" | "horoscope" | "tarot";
 
+const getShanghaiDate = () =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
@@ -175,12 +183,28 @@ export default function App() {
       const data = calculateAstrology(dateStr, gender);
       setBaziData(data);
 
+      const normalizedName = name.trim() || "anonymous";
+      const cacheKey = `bazi:${dateStr}:${gender}:${normalizedName}`;
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        console.log("命中传统算命缓存", cacheKey);
+        setReading(cached);
+        return;
+      }
+
       // 2. Stream interpretation from Gemini
       const stream = await generateInterpretation(data, gender, name);
+      let currentText = "";
       for await (const chunk of stream) {
         if (chunk.text) {
-          setReading((prev) => prev + chunk.text);
+          currentText += chunk.text;
+          setReading(currentText);
         }
+      }
+
+      if (currentText.trim()) {
+        localStorage.setItem(cacheKey, currentText);
       }
     } catch (error) {
       console.error(error);
@@ -328,8 +352,21 @@ export default function App() {
     setIsHoroscopeCalculating(true);
     setHoroscopeReading("");
     returnToTop();
+
+    const date = getShanghaiDate();
+    const cacheKey = `horoscope:${date}:${horoscopeSign}:${horoscopeType}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+      console.log("命中星座运势缓存", cacheKey);
+      setHoroscopeReading(cached);
+      setIsHoroscopeCalculating(false);
+      return;
+    }
     
     const prompt = `请以专业占星师身份，为「${horoscopeSign}」输出一份「${horoscopeType}」报告。
+
+当前日期：${date}
 
 请严格使用简体中文 Markdown，并按以下结构输出：
 
@@ -358,6 +395,10 @@ export default function App() {
       for await (const chunk of completion) {
         currentText += chunk.text;
         setHoroscopeReading(currentText);
+      }
+
+      if (currentText.trim()) {
+        localStorage.setItem(cacheKey, currentText);
       }
     } catch (error) {
       console.error(error);

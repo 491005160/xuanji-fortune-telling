@@ -112,7 +112,7 @@ async function streamOpenAICompatible(
     body: JSON.stringify({
       model,
       stream: true,
-      temperature: 0.7,
+      temperature: 0.3,
       messages: [
         {
           role: "system",
@@ -239,7 +239,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       model,
       contents: prompt,
       config: {
-        temperature: 0.7,
+        temperature: 0.3,
         systemInstruction:
           systemInstruction || "你是一位专业大师，以严谨神秘的风格提供解答。",
       },
