@@ -53,6 +53,71 @@ export default function App() {
     });
   };
 
+  const renderAIReport = (content: string) => (
+    <div className="max-w-4xl mx-auto space-y-5 text-[15px] leading-8 tracking-wide text-slate-300">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ node, ...props }) => (
+            <h1
+              className="text-xl md:text-2xl font-bold text-[#d4af37] border-b border-slate-800 pb-3 mb-6 mt-2 tracking-widest text-center"
+              {...props}
+            />
+          ),
+          h2: ({ node, ...props }) => (
+            <h2
+              className="text-base md:text-lg text-[#d4af37] font-semibold border-l-2 border-[#d4af37] pl-3 mt-8 mb-4 tracking-widest"
+              {...props}
+            />
+          ),
+          h3: ({ node, ...props }) => (
+            <h3
+              className="text-sm md:text-base font-bold text-slate-100 mt-6 mb-3 flex items-center gap-2"
+              {...props}
+            >
+              <span className="w-1 h-1 bg-[#d4af37] inline-block rounded-full" />
+              {props.children}
+            </h3>
+          ),
+          p: ({ node, ...props }) => (
+            <p
+              className="text-slate-300/90 leading-8 mb-4 text-justify whitespace-pre-wrap"
+              {...props}
+            />
+          ),
+          strong: ({ node, ...props }) => (
+            <strong className="text-slate-100 font-bold" {...props} />
+          ),
+          ul: ({ node, ...props }) => (
+            <ul
+              className="space-y-2 mb-5 text-slate-300/90 pl-4 border-l border-slate-800"
+              {...props}
+            />
+          ),
+          ol: ({ node, ...props }) => (
+            <ol
+              className="list-decimal space-y-2 mb-5 text-slate-300/90 pl-6"
+              {...props}
+            />
+          ),
+          li: ({ node, ...props }) => (
+            <li className="pl-1 leading-8" {...props} />
+          ),
+          blockquote: ({ node, ...props }) => (
+            <blockquote
+              className="border-l-2 border-[#d4af37]/50 pl-4 py-2 my-6 bg-black/20 italic text-slate-300 text-sm"
+              {...props}
+            />
+          ),
+          hr: () => <hr className="my-6 border-slate-800" />,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+      <div ref={endOfReadingRef} />
+    </div>
+  );
+
   const handleGenerateImage = async (ref: React.RefObject<HTMLDivElement>) => {
     if (!ref.current) return;
     setIsExporting(true);
@@ -264,7 +329,27 @@ export default function App() {
     setHoroscopeReading("");
     returnToTop();
     
-    const prompt = `As an expert Astrologer, please provide a ${horoscopeType} reading for ${horoscopeSign}. Provide a comprehensive reading covering Love, Career, and General advice. Use Markdown format. Write in simplified Chinese.`;
+    const prompt = `请以专业占星师身份，为「${horoscopeSign}」输出一份「${horoscopeType}」报告。
+
+请严格使用简体中文 Markdown，并按以下结构输出：
+
+# ${horoscopeSign} ${horoscopeType}
+## 总体概览
+用 2-3 句话给出今日/本周期的总基调。
+## 星象影响
+用一段说明主要能量，不要堆砌术语。
+## 爱情与人际
+用 2-3 条要点说明。
+## 事业与学业
+用 2-3 条要点说明。
+## 财富与决策
+用 2-3 条要点说明。
+## 健康与能量
+用 2-3 条要点说明。
+## 今日箴言
+用引用块输出一句短句。
+
+要求：段落清晰，避免大段连续文本；语气神秘但务实；仅供娱乐参考。`;
     
     try {
       const completion = await generateAIStream(prompt);
@@ -289,7 +374,27 @@ export default function App() {
     setTarotReading("");
     returnToTop();
     
-    const prompt = `As an expert Tarot reader, the user is asking: "${tarotQuestion}". They chose the "${tarotSpread}" spread. Draw the cards for them, explain its visual and meaning, and give clear, spiritual but grounded advice based on the interaction of the cards. Format the output in Markdown. Use a mystic, profound tone. Write in simplified Chinese.`;
+    const prompt = `请以专业塔罗解读师身份，为用户的问题进行「${tarotSpread}」解读。
+
+用户问题：「${tarotQuestion}」
+
+请严格使用简体中文 Markdown，并按以下结构输出：
+
+# 塔罗牌阵解读
+## 问题核心
+简要复述问题背后的核心张力。
+## 抽取牌面
+按牌位列出牌名，并用一句话描述每张牌的象征。
+## 牌面互动
+说明牌与牌之间的关系。
+## 当下建议
+用 3 条要点给出可执行建议。
+## 需要留意
+指出一个风险或盲点。
+## 灵性箴言
+用引用块输出一句短句。
+
+要求：段落清晰，避免大段连续文本；语气神秘但落地；仅供娱乐参考。`;
     
     try {
       const completion = await generateAIStream(prompt);
@@ -823,12 +928,7 @@ export default function App() {
                      <p className="text-sm tracking-widest animate-pulse">正在连接星盘... 请稍候</p>
                    </div>
                  ) : (
-                   <div className="prose prose-invert prose-slate max-w-none prose-sm md:prose-base prose-headings:text-[#d4af37] prose-headings:font-normal prose-a:text-[#d4af37]">
-                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {horoscopeReading}
-                     </ReactMarkdown>
-                     <div ref={endOfReadingRef} />
-                   </div>
+                   renderAIReport(horoscopeReading)
                  )}
               </motion.div>
             )}
@@ -982,12 +1082,7 @@ export default function App() {
                      <p className="text-sm tracking-widest animate-pulse">正在连结阿卡西记录... 请稍候</p>
                    </div>
                  ) : (
-                   <div className="prose prose-invert prose-slate max-w-none prose-sm md:prose-base prose-headings:text-[#d4af37] prose-headings:font-normal prose-a:text-[#d4af37]">
-                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {tarotReading}
-                     </ReactMarkdown>
-                     <div ref={endOfReadingRef} />
-                   </div>
+                   renderAIReport(tarotReading)
                  )}
               </motion.div>
             )}
